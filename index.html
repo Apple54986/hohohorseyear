@@ -12,7 +12,7 @@
       text-align: center;
       padding: 20px;
     }
-    input, textarea {
+    textarea {
       width: 90%;
       max-width: 420px;
       margin: 8px 0;
@@ -36,8 +36,7 @@
 <body>
   <h2>🎉 新年賀卡產生器</h2>
 
-  <input type="text" id="name" placeholder="你的名字">
-  <textarea id="message" rows="3" placeholder="你的祝福訊息"></textarea>
+  <textarea id="message" rows="3" placeholder="請輸入祝福訊息"></textarea>
 
   <div>
     <button id="previewBtn">👀 預覽賀卡</button>
@@ -55,16 +54,16 @@
     const canvas = document.getElementById("cardCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 📌 套用你的圖片比例：1080 × 1620
+    // 📌 使用你的圖片比例：1080 × 1620
     canvas.width = 1080;
     canvas.height = 1620;
 
-    // 📌 你的背景圖片（你提供的）
+    // 📌 背景圖片
     const bg = new Image();
     bg.crossOrigin = "anonymous";
-    bg.src = "https://raw.githubusercontent.com/apple54986/liff-test/main/新年賀卡.jpg";
+    bg.src = "https://raw.githubusercontent.com/apple54986/liff-test/main/馬年賀卡.png";
 
-    // ✨ 自動換行函式
+    // ✨ 自動換行
     function wrapText(text, x, y, maxWidth, lineHeight) {
       const words = text.split("");
       let line = "";
@@ -82,42 +81,31 @@
       ctx.fillText(line, x, y);
     }
 
-    // 🎨 主繪製函式
-    function drawCard(name, message) {
+    // 🎨 主繪製（只有祝福文字）
+    function drawCard(message) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // 🎯→ 「你的淡色文字框位置」
-      // 上邊界: 約 260 px
-      // 左右邊界: 140 px
-      // 寬度: 800 px
-      // 行高: 60 px
-
+      // ✨ 祝福文字位置（淡色框中）
       const textX = 540;        // 置中
-      const maxWidth = 800;     
-      let currentY = 420;       // 文字起始點
+      const startY = 420;       // 開始位置
+      const maxWidth = 800;
+      const lineHeight = 60;
 
-      // ✏️ 名字（第一行）
       ctx.fillStyle = "#333";
       ctx.textAlign = "center";
-      ctx.font = "bold 60px sans-serif";
-      ctx.fillText(name, textX, currentY);
-
-      // ✏️ 訊息（可換行）
       ctx.font = "48px sans-serif";
-      currentY += 80;
 
-      wrapText(message, textX, currentY, maxWidth, 60);
+      wrapText(message, textX, startY, maxWidth, lineHeight);
     }
 
     // 🔍 預覽
     document.getElementById("previewBtn").addEventListener("click", () => {
-      const name = document.getElementById("name").value || "好友";
       const message = document.getElementById("message").value || "祝你新年快樂！";
-      drawCard(name, message);
+      drawCard(message);
     });
 
-    // 📤 分享到 LINE
+    // 📤 分享到 LINE（分享圖片）
     document.getElementById("shareBtn").addEventListener("click", async () => {
       const dataUrl = canvas.toDataURL("image/png");
 
