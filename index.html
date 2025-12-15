@@ -1,8 +1,8 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>LINE 新年賀卡</title>
+  <title>專屬新年賀卡</title>
   <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
 
   <style>
@@ -12,36 +12,32 @@
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      margin-bottom: 10px;
-    }
     textarea {
       width: 90%;
-      max-width: 400px;
-      margin: 8px 0;
-      padding: 10px;
-      font-size: 16px;
+      max-width: 420px;
+      margin: 10px 0;
+      padding: 12px;
+      font-size: 17px;
     }
     button {
-      margin: 10px 5px;
-      padding: 10px 18px;
+      margin: 6px;
+      padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
     }
     canvas {
       margin-top: 15px;
       max-width: 100%;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.2);
+      border-radius: 14px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 
 <body>
-  <h1>🎉 新年賀卡</h1>
+  <h2>專屬新年賀卡</h2>
 
-  <!-- ❌ 名字輸入框已移除 -->
-  <textarea id="message" rows="3" placeholder="請輸入新年祝福話"></textarea>
+  <textarea id="message" rows="3" placeholder="請輸入新年祝福"></textarea>
 
   <div>
     <button id="previewBtn">👀 預覽賀卡</button>
@@ -59,58 +55,74 @@
     const canvas = document.getElementById("cardCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🎨 套用你提供的圖片比例（寬1414 x 高 2000）
-    canvas.width = 1414;
-    canvas.height = 2000;
+    // 🎨 Canvas 尺寸（依圖片）
+    canvas.width = 1080;
+    canvas.height = 1620;
 
+    // 📌 背景圖片（請確認是英文檔名）
     const bg = new Image();
     bg.crossOrigin = "anonymous";
-    bg.src = "https://raw.githubusercontent.com/apple54986/liff-test/main/馬年賀卡.jpg";
+    bg.src = "https://raw.githubusercontent.com/apple54986/liff-test/main/horse.jpg";
 
+    // ✨ 自動換行工具
+    function wrapText(text, x, startY, maxWidth, lineHeight) {
+      const chars = text.split("");
+      let line = "";
+      let y = startY;
+
+      for (let i = 0; i < chars.length; i++) {
+        const testLine = line + chars[i];
+        if (ctx.measureText(testLine).width > maxWidth) {
+          ctx.fillText(line, x, y);
+          line = chars[i];
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+
+    // 🎨 繪製賀卡（文字位置已精算）
     function drawCard(message) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
-      // ✅ 祝福文字（置中 + 自動換行）
-      ctx.fillStyle = "#c0392b";
-      ctx.font = "bold 60px serif";
+      // 📍 淡黃色框框區域（安全範圍）
+      const centerX = canvas.width / 2; // 540
+      const startY = 420;               // 框框上緣內縮
+      const maxWidth = 760;             // 不超出框框
+      const lineHeight = 64;
+
       ctx.textAlign = "center";
+      ctx.fillStyle = "#c0392b";        // 喜氣紅
+      ctx.font = "bold 52px serif";
 
-      const maxWidth = 800;  
-      let line = "";
-      let y = 900; // 依你的空白框位置自行微調
-
-      message.split("").forEach(char => {
-        const testLine = line + char;
-        if (ctx.measureText(testLine).width > maxWidth) {
-          ctx.fillText(line, canvas.width / 2, y);
-          line = char;
-          y += 70;
-        } else {
-          line = testLine;
-        }
-      });
-
-      ctx.fillText(line, canvas.width / 2, y);
+      wrapText(message, centerX, startY, maxWidth, lineHeight);
     }
 
+    // 👀 預覽
     document.getElementById("previewBtn").addEventListener("click", () => {
-      const message = document.getElementById("message").value || "新年快樂！";
+      const message =
+        document.getElementById("message").value || "新年快樂，萬事如意！";
       drawCard(message);
     });
 
+    // 📤 分享（先預覽再分享）
     document.getElementById("shareBtn").addEventListener("click", async () => {
-      const message = document.getElementById("message").value || "新年快樂！";
+      const dataUrl = canvas.toDataURL("image/png");
 
       try {
         await liff.shareTargetPicker([
           {
-            type: "text",
-            text: `🎊 我的新年賀卡\n\n${message}\n\n👉 點這裡製作你的賀卡：\nhttps://apple54986.github.io/liff-test/`
+            type: "image",
+            originalContentUrl: dataUrl,
+            previewImageUrl: dataUrl
           }
         ]);
       } catch (err) {
         console.error(err);
+        alert("請在 LINE 中開啟再分享");
       }
     });
   </script>
