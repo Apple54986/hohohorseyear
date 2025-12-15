@@ -80,7 +80,12 @@
   <div>
     <button id="previewBtn">👀 預覽賀卡</button>
     <button id="downloadBtn">⬇️ 儲存圖片</button>
-  document.getElementById("downloadBtn").addEventListener("click", () => {
+  </div>
+
+  <canvas id="cardCanvas"></canvas>
+
+  <script>
+    document.getElementById("downloadBtn").addEventListener("click", () => {
   canvas.toBlob((blob) => {
     if (!blob) {
       alert("圖片產生失敗，請重新預覽");
@@ -99,6 +104,10 @@
     URL.revokeObjectURL(url);
   }, "image/png");
 });
+
+    const canvas = document.getElementById("cardCanvas");
+    const ctx = canvas.getContext("2d");
+
     // 🎨 Canvas 尺寸（對應 horse.jpg）
     canvas.width = 1080;
     canvas.height = 1620;
