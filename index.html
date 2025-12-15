@@ -85,26 +85,6 @@
   <canvas id="cardCanvas"></canvas>
 
   <script>
-    document.getElementById("downloadBtn").addEventListener("click", () => {
-  canvas.toBlob((blob) => {
-    if (!blob) {
-      alert("圖片產生失敗，請重新預覽");
-      return;
-    }
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "新年賀卡.png"; // 存檔名稱
-    document.body.appendChild(a);
-    a.click();
-
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }, "image/png");
-});
-
     const canvas = document.getElementById("cardCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -141,7 +121,7 @@
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
       const centerX = canvas.width / 2;
-      const startY = 800;   // 淡黃色框內最佳位置
+      const startY = 900;   // 淡黃色框內最佳位置
       const maxWidth = 720;
       const lineHeight = 66;
 
