@@ -88,20 +88,19 @@
     const canvas = document.getElementById("cardCanvas");
     const ctx = canvas.getContext("2d");
 
-    // 🎨 Canvas 尺寸（對應 horse.jpg）
+    // Canvas 尺寸
     canvas.width = 1080;
     canvas.height = 1620;
 
-    // 🖼 背景圖片（GitHub 上）
+    // 背景圖片
     const bg = new Image();
     bg.crossOrigin = "anonymous";
     bg.src = "https://raw.githubusercontent.com/apple54986/liff-test/main/horse.jpg";
 
-    // ✨ 自動換行（適合中文）
+    // 自動換行
     function wrapText(ctx, text, x, startY, maxWidth, lineHeight) {
       let line = "";
       let y = startY;
-
       for (let i = 0; i < text.length; i++) {
         const testLine = line + text[i];
         if (ctx.measureText(testLine).width > maxWidth && line !== "") {
@@ -115,13 +114,17 @@
       ctx.fillText(line, x, y);
     }
 
-    // 🎉 繪製賀卡（文字位置已調整好）
+    // 繪製賀卡
     function drawCard(message) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
+      // 淡黃色框
+      ctx.fillStyle = "rgba(255, 250, 200, 0.6)";
+      ctx.fillRect(180, 750, 720, 200);
+
       const centerX = canvas.width / 2;
-      const startY = 550;   // 淡黃色框內最佳位置
+      const startY = 820; // 調整文字在框中位置
       const maxWidth = 720;
       const lineHeight = 66;
 
@@ -132,20 +135,29 @@
       wrapText(ctx, message, centerX, startY, maxWidth, lineHeight);
     }
 
-    // 👀 預覽
+    // 預覽按鈕
     document.getElementById("previewBtn").addEventListener("click", () => {
-      const message =
-        document.getElementById("message").value || "新年快樂";
+      const message = document.getElementById("message").value || "新年快樂";
       drawCard(message);
       document.getElementById("downloadBtn").style.display = "inline-block";
     });
 
-    // ⬇️ 儲存圖片到手機
+    // 下載按鈕（支援手機/LINE）
     document.getElementById("downloadBtn").addEventListener("click", () => {
-      const link = document.createElement("a");
-      link.download = "新年賀卡.png";
-      link.href = canvas.toDataURL("image/png");
-      link.click();
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          alert("圖片產生失敗，請先預覽");
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "新年賀卡.png";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, "image/png");
     });
   </script>
 
