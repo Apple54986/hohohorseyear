@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>客製化祝福卡片</title>
+    <title>客製化祝福賀卡</title>
     <link rel="stylesheet" href="style.css">
     <!-- 引入 LINE LIFF SDK -->
     <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
@@ -14,10 +14,10 @@
         
         <div class="input-group">
             <label for="nameInput">輸入名字：</label>
-            <input type="text" id="nameInput" placeholder="例如: 王小明" maxlength="10">
+            <input type="text" id="nameInput" placeholder="例如: 馬尚萊" maxlength="10">
             
             <label for="msgInput">輸入祝福語：</label>
-            <input type="text" id="msgInput" placeholder="例如: 馬上有錢" maxlength="12">
+            <input type="text" id="msgInput" placeholder="例如: 新春愉快" maxlength="12">
             
             <button id="generateBtn">生成圖片</button>
         </div>
@@ -151,7 +151,7 @@ const config = {
     liffId: "2008578496-5ovBYvYv", 
 
     // 背景圖片檔名 (請確認 GitHub 上有這張圖)
-    bgImage: "template.jpg", 
+    bgImage: "馬年賀卡.jpg", 
 
     // 「名字」的文字設定
     nameText: {
