@@ -51,6 +51,13 @@
       await liff.init({ liffId: "2008578496-5ovBYvYv" });
     }
     main();
+// ✏️ 限制最多 15 字
+const textarea = document.getElementById("message");
+textarea.addEventListener("input", () => {
+  if (textarea.value.length > 15) {
+    textarea.value = textarea.value.slice(0, 15);
+  }
+});
 
     const canvas = document.getElementById("cardCanvas");
     const ctx = canvas.getContext("2d");
@@ -105,8 +112,22 @@
     document.getElementById("previewBtn").addEventListener("click", () => {
       const message =
         document.getElementById("message").value || "新年快樂，萬事如意！";
-      drawCard(message);
-    });
+      function drawCard(message) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+  // 🎯 淡黃色框的最佳視覺區域（實測）
+  const centerX = canvas.width / 2; // 540
+  const startY = 460;               // 文字垂直置中偏上
+  const maxWidth = 720;             // 框內安全寬
+  const lineHeight = 66;
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#c40000";        // 喜氣紅
+  ctx.font = "bold 54px serif";
+
+  wrapText(ctx, message, centerX, startY, maxWidth, lineHeight);
+}
 
     // 📤 分享（先預覽再分享）
     document.getElementById("shareBtn").addEventListener("click", async () => {
