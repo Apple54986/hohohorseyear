@@ -5,26 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>專屬新年賀卡</title>
 
+  <!-- 引入 Google 字體：馬善政毛筆體 (最接近榜書質感的免費字體) -->
+  <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: "Microsoft JhengHei", -apple-system, sans-serif;
       background: #f5f5f5;
       text-align: center;
       padding: 20px 16px;
       margin: 0;
     }
 
-    h2 {
-      margin-bottom: 12px;
-      color: #333;
-    }
+    h2 { margin-bottom: 12px; color: #333; }
 
     textarea {
+      /* 讓輸入框預覽時也顯示毛筆感 */
+      font-family: 'Ma Shan Zheng', cursive;
       width: 100%;
       max-width: 400px;
       margin: 10px 0;
       padding: 12px;
-      font-size: 16px;
+      font-size: 20px;
+      color: #c3262d; /* 輸入時也是紅色 */
       border-radius: 12px;
       border: 1px solid #ccc;
       resize: none;
@@ -32,19 +35,9 @@
       outline: none;
     }
     
-    textarea:focus {
-      border-color: #c40000;
-    }
+    textarea:focus { border-color: #c3262d; }
 
-    .hint {
-      font-size: 13px;
-      color: #888;
-      margin-bottom: 15px;
-    }
-
-    .btn-group {
-      margin-bottom: 20px;
-    }
+    .hint { font-size: 13px; color: #888; margin-bottom: 15px; }
 
     button {
       margin: 5px;
@@ -57,24 +50,17 @@
       transition: opacity 0.2s;
     }
     
-    button:active {
-      opacity: 0.8;
-    }
-
-    #previewBtn {
-      background: #e0e0e0;
-      color: #333;
-    }
+    #previewBtn { background: #e0e0e0; color: #333; }
 
     #downloadBtn {
-      background: #ff5252; /* 紅色按鈕 */
+      background: #c3262d; /* 改為指定的紅色 */
       color: #fff;
-      display: none; /* 預設隱藏 */
-      box-shadow: 0 4px 6px rgba(255, 82, 82, 0.3);
+      display: none; 
+      box-shadow: 0 4px 6px rgba(195, 38, 45, 0.3);
     }
 
     canvas {
-      margin: 0 auto;
+      margin: 20px auto;
       max-width: 100%;
       height: auto;
       border-radius: 12px;
@@ -82,13 +68,7 @@
       display: block;
     }
     
-    /* 讀取中的遮罩 */
-    #loading {
-      display: none;
-      margin-top: 10px;
-      color: #666;
-      font-size: 14px;
-    }
+    #loading { display: none; margin-top: 10px; color: #666; }
   </style>
 </head>
 
@@ -100,10 +80,10 @@
     id="message"
     rows="2"
     maxlength="11"
-    placeholder="在此輸入祝福語 (11字內)"
+    placeholder="在此輸入祝福語..."
   ></textarea>
 
-  <div class="hint">💡 輸入 11 個字以內</div>
+  <div class="hint">💡 建議輸入 4~8 個字效果最好</div>
 
   <div class="btn-group">
     <button id="previewBtn">預覽賀卡</button>
@@ -120,23 +100,20 @@
     const downloadBtn = document.getElementById("downloadBtn");
     const loadingText = document.getElementById("loading");
 
-    // 設定畫布解析度
     canvas.width = 1080;
     canvas.height = 1620;
 
-    // 1. 載入背景圖 (使用 Promise 確保載入完成)
     const bgSrc = "https://raw.githubusercontent.com/apple54986/liff-test/main/horse.jpg";
     let bgImage = null;
 
     function loadBg() {
       return new Promise((resolve, reject) => {
-        if (bgImage) return resolve(bgImage); // 如果已載入過
+        if (bgImage) return resolve(bgImage);
         const img = new Image();
-        img.crossOrigin = "anonymous"; // 關鍵：允許跨域
+        img.crossOrigin = "anonymous";
         img.src = bgSrc;
         img.onload = () => {
           bgImage = img;
-          // 預設先畫一次空背景
           ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
           resolve(img);
         };
@@ -144,10 +121,8 @@
       });
     }
 
-    // 初始化載入
     loadBg().catch(err => console.error(err));
 
-    // 2. 文字換行邏輯
     function wrapText(ctx, text, x, startY, maxWidth, lineHeight) {
       let line = "";
       let y = startY;
@@ -164,86 +139,71 @@
       ctx.fillText(line, x, y);
     }
 
-    // 3. 繪製賀卡主程式
     async function drawCard() {
       const message = document.getElementById("message").value || "新年快樂";
       
       try {
+        // 確保字體已加載完成再繪製，否則 Canvas 會抓不到字體
+        await document.fonts.load('100px "Ma Shan Zheng"');
+        
         const bg = await loadBg();
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
 
         const centerX = canvas.width / 2;
         const startY = 820; 
-        const maxWidth = 720;
-        const lineHeight = 90;
+        const maxWidth = 800;
+        const lineHeight = 120;
 
         ctx.textAlign = "center";
-        ctx.fillStyle = "#000000";
-        ctx.font = "bold 65px serif"; // 可視需要換字體
+        
+        // --- 修改重點：字體顏色與樣式 ---
+        ctx.fillStyle = "#c3262d"; // 指定紅色
+        // 使用 Google Font，並增加字體大小使其有「榜書」的大氣感
+        ctx.font = "normal 110px 'Ma Shan Zheng', cursive"; 
 
         wrapText(ctx, message, centerX, startY, maxWidth, lineHeight);
         
-        // 顯示下載按鈕
         downloadBtn.style.display = "inline-block";
         
       } catch (error) {
-        alert("發生錯誤：" + error);
+        console.error(error);
+        alert("字體或圖片載入失敗，請重試");
       }
     }
 
-    // 4. 處理分享與下載 (核心修改部分)
     async function handleDownload() {
       loadingText.style.display = "block";
-      
       canvas.toBlob(async (blob) => {
         if (!blob) {
           loadingText.style.display = "none";
-          alert("圖片產生失敗");
           return;
         }
-
         const fileName = "新年賀卡.png";
         const file = new File([blob], fileName, { type: "image/png" });
 
-        // A. 優先嘗試 Web Share API (手機原生分享選單)
-        // 這是目前在手機上體驗最好的方式：會跳出「儲存影像」、「傳送到LINE」等選項
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
           try {
-            await navigator.share({
-              files: [file],
-              title: '新年賀卡',
-              text: '2026年馬上有錢!!!'
-            });
+            await navigator.share({ files: [file], title: '新年賀卡', text: '祝您 2026 馬上有錢！' });
             loadingText.style.display = "none";
-            return; // 成功分享後就結束
+            return;
           } catch (error) {
-            // 使用者取消分享不視為錯誤，但如果是其他錯誤則繼續執行 B 方案
-            if (error.name !== 'AbortError') {
-              console.log('Share API error:', error);
-            }
+            if (error.name !== 'AbortError') console.log('Share error:', error);
           }
         }
 
-        // B. 備用方案：傳統下載 (電腦版或不支援 Share 的環境)
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
         a.download = fileName;
-        document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
         loadingText.style.display = "none";
-        
       }, "image/png");
     }
 
-    // 綁定事件
     document.getElementById("previewBtn").addEventListener("click", drawCard);
     downloadBtn.addEventListener("click", handleDownload);
-
   </script>
 </body>
 </html>
